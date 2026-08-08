@@ -1,0 +1,1 @@
+{"version":3,"file":"rotationItem.d.ts","sourceRoot":"","sources":["../../../src/generated/types/rotationItem.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AACH,OAAO,KAAK,EAAE,gBAAgB,EAAE,MAAM,oBAAoB,CAAC;AAE3D,MAAM,WAAW,YAAY;IAC3B,IAAI,EAAE,gBAAgB,CAAC;IACvB,IAAI,EAAE,MAAM,CAAC;IACb,gBAAgB;IAChB,GAAG,CAAC,EAAE,MAAM,GAAG,IAAI,CAAC;CACrB"}

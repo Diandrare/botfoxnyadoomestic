@@ -1,0 +1,616 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: Discord Bot API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: bot
+    description: Discord bot status and controls
+  - name: moderation
+    description: Moderation action logs
+  - name: ai
+    description: AI chat conversations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /bot/status:
+    get:
+      operationId: getBotStatus
+      tags: [bot]
+      summary: Get bot status and current activity
+      responses:
+        "200":
+          description: Bot status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BotStatus"
+
+  /bot/activity:
+    post:
+      operationId: setBotActivity
+      tags: [bot]
+      summary: Set bot activity status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ActivityInput"
+      responses:
+        "200":
+          description: Updated status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BotStatus"
+
+  /bot/rotation:
+    get:
+      operationId: getBotRotation
+      tags: [bot]
+      summary: Get current status rotation config
+      responses:
+        "200":
+          description: Rotation config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RotationConfig"
+    post:
+      operationId: setBotRotation
+      tags: [bot]
+      summary: Set status rotation config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RotationConfig"
+      responses:
+        "200":
+          description: Updated rotation config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RotationConfig"
+
+  /bot/boost:
+    get:
+      operationId: getBoostConfig
+      tags: [bot]
+      summary: Get boost notification config
+      responses:
+        "200":
+          description: Boost config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoostConfig"
+    post:
+      operationId: setBoostConfig
+      tags: [bot]
+      summary: Update boost notification config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BoostConfig"
+      responses:
+        "200":
+          description: Updated boost config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoostConfig"
+
+  /bot/guilds:
+    get:
+      operationId: listBotGuilds
+      tags: [bot]
+      summary: List all servers the bot is in
+      responses:
+        "200":
+          description: List of guilds
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Guild"
+
+  /moderation/actions:
+    get:
+      operationId: listModerationActions
+      tags: [moderation]
+      summary: List all moderation actions
+      parameters:
+        - name: guildId
+          in: query
+          schema:
+            type: string
+        - name: action
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: List of actions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ModerationAction"
+    post:
+      operationId: createModerationAction
+      tags: [moderation]
+      summary: Log a moderation action
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ModerationActionInput"
+      responses:
+        "201":
+          description: Created action
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModerationAction"
+
+  /moderation/actions/{id}:
+    delete:
+      operationId: deleteModerationAction
+      tags: [moderation]
+      summary: Delete a moderation action record
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /moderation/stats:
+    get:
+      operationId: getModerationStats
+      tags: [moderation]
+      summary: Get moderation statistics (counts by action type)
+      parameters:
+        - name: guildId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ModerationStats"
+
+  /ai/conversations:
+    get:
+      operationId: listAiConversations
+      tags: [ai]
+      summary: List AI chat conversations
+      responses:
+        "200":
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AiConversation"
+    post:
+      operationId: createAiConversation
+      tags: [ai]
+      summary: Create a new AI conversation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiConversationInput"
+      responses:
+        "201":
+          description: Created conversation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiConversation"
+
+  /ai/conversations/{id}:
+    get:
+      operationId: getAiConversation
+      tags: [ai]
+      summary: Get a conversation with its messages
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Conversation with messages
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AiConversationWithMessages"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deleteAiConversation
+      tags: [ai]
+      summary: Delete a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /ai/conversations/{id}/messages:
+    get:
+      operationId: listAiMessages
+      tags: [ai]
+      summary: List messages in a conversation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AiMessage"
+    post:
+      operationId: sendAiMessage
+      tags: [ai]
+      summary: Send a message (returns SSE stream)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AiMessageInput"
+      responses:
+        "200":
+          description: SSE stream of response chunks
+          content:
+            text/event-stream: {}
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    BotStatus:
+      type: object
+      properties:
+        online:
+          type: boolean
+        uptime:
+          type: ["number", "null"]
+        activityType:
+          type: ["string", "null"]
+        activityName:
+          type: ["string", "null"]
+        guildCount:
+          type: number
+        memberCount:
+          type: number
+      required:
+        - online
+        - uptime
+        - activityType
+        - activityName
+        - guildCount
+        - memberCount
+
+    ActivityInput:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [playing, watching, listening, streaming]
+        name:
+          type: string
+        url:
+          type: ["string", "null"]
+      required:
+        - type
+        - name
+
+    Guild:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        memberCount:
+          type: number
+        iconUrl:
+          type: ["string", "null"]
+      required:
+        - id
+        - name
+        - memberCount
+        - iconUrl
+
+    ModerationAction:
+      type: object
+      properties:
+        id:
+          type: number
+        guildId:
+          type: string
+        userId:
+          type: string
+        username:
+          type: string
+        moderatorId:
+          type: string
+        moderatorName:
+          type: string
+        action:
+          type: string
+          enum: [kick, ban, warn, mute]
+        reason:
+          type: ["string", "null"]
+        duration:
+          type: ["number", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - guildId
+        - userId
+        - username
+        - moderatorId
+        - moderatorName
+        - action
+        - reason
+        - duration
+        - createdAt
+
+    ModerationActionInput:
+      type: object
+      properties:
+        guildId:
+          type: string
+        userId:
+          type: string
+        username:
+          type: string
+        moderatorId:
+          type: string
+        moderatorName:
+          type: string
+        action:
+          type: string
+          enum: [kick, ban, warn, mute]
+        reason:
+          type: ["string", "null"]
+        duration:
+          type: ["number", "null"]
+      required:
+        - guildId
+        - userId
+        - username
+        - moderatorId
+        - moderatorName
+        - action
+
+    ModerationStats:
+      type: object
+      properties:
+        total:
+          type: number
+        kicks:
+          type: number
+        bans:
+          type: number
+        warns:
+          type: number
+        mutes:
+          type: number
+      required:
+        - total
+        - kicks
+        - bans
+        - warns
+        - mutes
+
+    AiConversation:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        discordUserId:
+          type: ["string", "null"]
+        discordUsername:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - title
+        - discordUserId
+        - discordUsername
+        - createdAt
+
+    AiConversationInput:
+      type: object
+      properties:
+        title:
+          type: string
+        discordUserId:
+          type: ["string", "null"]
+        discordUsername:
+          type: ["string", "null"]
+      required:
+        - title
+
+    AiMessage:
+      type: object
+      properties:
+        id:
+          type: number
+        conversationId:
+          type: number
+        role:
+          type: string
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - conversationId
+        - role
+        - content
+        - createdAt
+
+    AiConversationWithMessages:
+      type: object
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        discordUserId:
+          type: ["string", "null"]
+        discordUsername:
+          type: ["string", "null"]
+        createdAt:
+          type: string
+          format: date-time
+        messages:
+          type: array
+          items:
+            $ref: "#/components/schemas/AiMessage"
+      required:
+        - id
+        - title
+        - discordUserId
+        - discordUsername
+        - createdAt
+        - messages
+
+    AiMessageInput:
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+
+    RotationItem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [playing, watching, listening, streaming]
+        name:
+          type: string
+        url:
+          type: ["string", "null"]
+      required:
+        - type
+        - name
+
+    RotationConfig:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        intervalSeconds:
+          type: number
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/RotationItem"
+      required:
+        - enabled
+        - intervalSeconds
+        - items
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

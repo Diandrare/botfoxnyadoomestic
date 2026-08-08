@@ -1,0 +1,1 @@
+{"version":3,"file":"rotationConfig.d.ts","sourceRoot":"","sources":["../../../src/generated/types/rotationConfig.ts"],"names":[],"mappings":"AAAA;;;;;;GAMG;AACH,OAAO,KAAK,EAAE,YAAY,EAAE,MAAM,gBAAgB,CAAC;AAEnD,MAAM,WAAW,cAAc;IAC7B,OAAO,EAAE,OAAO,CAAC;IACjB,eAAe,EAAE,MAAM,CAAC;IACxB,KAAK,EAAE,YAAY,EAAE,CAAC;CACvB"}
